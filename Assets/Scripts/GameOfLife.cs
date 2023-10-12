@@ -31,7 +31,6 @@ public class GameOfLife : MonoBehaviour
     public AudioSource source;
 
     int numberOfColums, numberOfRows;
-    int hej = 1;
 
     Vector2 gridOrigin = Vector2.zero;
 
