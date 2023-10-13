@@ -2771,7 +2771,7 @@ MonoBehaviour:
   volume: 0
   cellSize: 0
   spawnPercentage: 0
-  musicOn: 0
+  musicOn: 1
   volumeSaver: 0
 --- !u!1 &1653975723
 GameObject:

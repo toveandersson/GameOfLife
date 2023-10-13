@@ -28,20 +28,14 @@ public class GameOfLife : MonoBehaviour
     public float cellSize = 0.1f;
     public float spawnChancePercentage = 5f;
     public float musicVolume = 1f;
-    public AudioSource source;
-
-    int numberOfColums, numberOfRows;
-
-    Vector2 gridOrigin = Vector2.zero;
-
     float generationDelay = 0.38f; //0.42
+    public AudioSource source;
+    int numberOfColums, numberOfRows;
 
     bool rPressed = false;
     bool frogFrame = true;
     bool nPressed = false;
     bool mute = false;
-    public TextMesh musicText;
-    private MeshRenderer meshRenderer;
     bool acorn = false;
     bool toad = false;
     bool achimsp = false;
@@ -62,6 +56,62 @@ public class GameOfLife : MonoBehaviour
     public int X;
     public int Y;
 
+    void Start()
+    {
+        musicVolume = PlayerPrefs.GetFloat("volume", 0.3f);
+        if (PlayerPrefs.GetFloat("volumeOn") == 0f)
+        {   
+            musicVolume = 0f;
+        }
+        source.volume = musicVolume;
+
+        cellSize = PlayerPrefs.GetFloat("cellsize", 0.5f);
+        spawnChancePercentage = PlayerPrefs.GetFloat("spawnpercentage", 15f);
+
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+
+        //Calculate our grid depending on size and cellSize
+        numberOfColums = (int)Mathf.Floor((Camera.main.orthographicSize *
+            Camera.main.aspect * 2) / cellSize);
+        numberOfRows = (int)Mathf.Floor(Camera.main.orthographicSize * 2 / cellSize);
+
+        //Initiate our matrix array
+        cells = new Cell[numberOfColums+matrixOffset+1, numberOfRows+matrixOffset+1];
+        fadedCells = new FadedCells[numberOfColums + matrixOffset + 1, numberOfRows + matrixOffset + 1];
+        conditionForLifeQuestionMark = new int[numberOfColums + matrixOffset + 1, numberOfRows + matrixOffset + 1];
+        conditionForFadedLifeQuestionMark = new int[numberOfColums + matrixOffset + 1, numberOfRows + matrixOffset + 1];
+
+        //Create all objects
+        for (int x = spawnOffset; x < cells.GetLength(0)+ spawnEnd; x++)  //all
+        {
+            for (int y = spawnOffset; y < cells.GetLength(1)+ spawnEnd; y++)
+            {
+                //Create our game cell objects, multiply by cellSize for correct world placement
+                Vector2 newPos = new Vector2(x * cellSize - Camera.main.orthographicSize *
+                    Camera.main.aspect ,
+                    y * cellSize - Camera.main.orthographicSize);
+
+                var newCell = Instantiate(cellPrefab, newPos, Quaternion.identity);
+                newCell.transform.localScale = Vector2.one * cellSize;
+                cells[x, y] = newCell.GetComponent<Cell>();
+
+
+                var newFadedCell = Instantiate(fadedCellPrefab, newPos, Quaternion.identity);
+                newFadedCell.transform.localScale = Vector2.one * cellSize;
+                fadedCells[x, y] = newFadedCell.GetComponent<FadedCells>();
+
+                cells[x, y].alive = false;
+                fadedCells[x, y].alive = false;
+                cells[x, y].UpdateStatus();
+                fadedCells[x, y].UpdateStatus();
+
+                cells[x, y].XIndex = x;
+                cells[x, y].YIndex = y;
+            }
+        }
+        AllFrogsHalfwayUp();
+    }
     private void Update()
     {
         if (Input.GetKey(KeyCode.UpArrow))
@@ -178,64 +228,6 @@ public class GameOfLife : MonoBehaviour
 
     }
 
-    void Start()
-    {
-        musicVolume = PlayerPrefs.GetFloat("volume", 0.2f);
-        //musicText.text = "♫frosti - björk";
-        if (PlayerPrefs.GetFloat("volumeOn") == 0f)
-        {   
-            musicVolume = 0f;
-            //musicText.text = " ";
-        }
-        source.volume = musicVolume;
-
-        cellSize = PlayerPrefs.GetFloat("cellsize", 0.5f);
-        spawnChancePercentage = PlayerPrefs.GetFloat("spawnpercentage", 15f);
-
-        QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 60;
-
-        //Calculate our grid depending on size and cellSize
-        numberOfColums = (int)Mathf.Floor((Camera.main.orthographicSize *
-            Camera.main.aspect * 2) / cellSize);
-        numberOfRows = (int)Mathf.Floor(Camera.main.orthographicSize * 2 / cellSize);
-
-        //Initiate our matrix array
-        cells = new Cell[numberOfColums+matrixOffset+1, numberOfRows+matrixOffset+1];
-        fadedCells = new FadedCells[numberOfColums + matrixOffset + 1, numberOfRows + matrixOffset + 1];
-        conditionForLifeQuestionMark = new int[numberOfColums + matrixOffset + 1, numberOfRows + matrixOffset + 1];
-        conditionForFadedLifeQuestionMark = new int[numberOfColums + matrixOffset + 1, numberOfRows + matrixOffset + 1];
-
-        //Create all objects
-        for (int x = spawnOffset; x < cells.GetLength(0)+ spawnEnd; x++)  //all
-        {
-            for (int y = spawnOffset; y < cells.GetLength(1)+ spawnEnd; y++)
-            {
-                //Create our game cell objects, multiply by cellSize for correct world placement
-                Vector2 newPos = new Vector2(x * cellSize - Camera.main.orthographicSize *
-                    Camera.main.aspect ,
-                    y * cellSize - Camera.main.orthographicSize);
-
-                var newCell = Instantiate(cellPrefab, newPos, Quaternion.identity);
-                newCell.transform.localScale = Vector2.one * cellSize;
-                cells[x, y] = newCell.GetComponent<Cell>();
-
-
-                var newFadedCell = Instantiate(fadedCellPrefab, newPos, Quaternion.identity);
-                newFadedCell.transform.localScale = Vector2.one * cellSize;
-                fadedCells[x, y] = newFadedCell.GetComponent<FadedCells>();
-
-                cells[x, y].alive = false;
-                fadedCells[x, y].alive = false;
-                cells[x, y].UpdateStatus();
-                fadedCells[x, y].UpdateStatus();
-
-                cells[x, y].XIndex = x;
-                cells[x, y].YIndex = y;
-            }
-        }
-        AllFrogsHalfwayUp();
-    }
     private void AllFrogsHalfwayUp()
     {
         for (int y = spawnOffset; y < cells.GetLength(1) + spawnEnd; y++) 
@@ -404,9 +396,9 @@ public class GameOfLife : MonoBehaviour
             conditionForLifeQuestionMark[x, y] = 1;
             conditionForFadedLifeQuestionMark[x, y] = 0;
         }
-        else if (neighborSum > 3)
+        else if (neighborSum > 3) 
         {
-            conditionForLifeQuestionMark[x, y] = 0;
+            conditionForLifeQuestionMark[x, y] = 0; 
             if (cells[x, y].alive)
             {
                 if (!nPressed)
