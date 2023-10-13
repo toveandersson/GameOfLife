@@ -225,7 +225,6 @@ public class GameOfLife : MonoBehaviour
 
         if ((Input.GetMouseButtonDown(0)) && (gosper == true))
         { conditionForGosperLife = 1; }
-
     }
 
     private void AllFrogsHalfwayUp()
