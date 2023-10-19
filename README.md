@@ -1,9 +1,9 @@
 # GameOfLife
-My take on Conways game of life with frogs that I didn't paint but stole from another project (credit to Axel Björkman<3) :
+My take on Conways game of life with frogs that I didn't paint but stole from another project (credit to Axel Björkman<3) 
 
 ![Movie_001](https://github.com/toveandersson/GameOfLife/assets/142992384/ee9eb6f0-54d0-473d-b844-3af40e6ca83a)
 
-When the game had the right behaviour I tried to make some features in different areas to learn as much basics that I could, as for example about UI systems, basic code-structure/loops/functions, some about sound and saving settings between scenes, raycasting etc.
+When the game had the right behaviour I tried to make some features in different areas to learn as much basics as possible, as for example about UI systems, basic code-structure/loops/functions, some about sound and saving settings between scenes, raycasting etc.
 
 All of the features in the game are listed in the dropdown-list. There are options to clear the screen, regenerate, mute, and adjust speed. There are a few visual-preferences options like for example N for "no halfway down frogs" wich will make the "dying" cells dissappear (or be visible if you press again), and there are some different patterns which can be spawned by pressing the specific key for the pattern and then placing it by clicking the mousebutton. Pressing C will make any pressed button clear, otherwise you could spawn many patterns at once.
 
